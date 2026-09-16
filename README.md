@@ -29,7 +29,7 @@ each unit a within-corpus reliability tier.
 notebooks/        pipeline notebooks, numbered in run order (00-16)
   layer2_foldwise.py     fold-local vocabulary + token features
   layer3_reliability.py  calibration and selective prediction
-  manuscript_cnn_baseline_experiment.ipynb   log-mel CNN baseline
+  cnn_baseline.ipynb     log-mel CNN baseline
 configs/config.yaml   paths and parameters
 docker/               runtime image
 ```
@@ -46,6 +46,13 @@ docker run --rm --gpus all -v "$(pwd)":/workspace -w /workspace cowvocal \
 
 Run the notebooks in order. Seeds are fixed in `configs/config.yaml` and in the
 clustering and model code, so runs are reproducible.
+
+## Results and outputs
+
+Notebook outputs are not committed and the `output/` directory is generated
+locally, so the repository stays code-only. Reported results and figures are in
+the paper and its supplementary material; reproducing them requires the Zenodo
+dataset (see below).
 
 ## Data
 

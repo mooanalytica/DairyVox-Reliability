@@ -1,0 +1,89 @@
+project:
+  root_dir: /workspace/stage4_pipeline
+  random_seed: 42
+
+paths:
+  dataset_zip: data/Dataset.zip
+  extracted_audio_dir: data/extracted
+  metadata_file: data/metadata/metadata_full_clips.xlsx
+  output_dir: output
+  log_dir: output/logs
+
+manifest:
+  auto_extract_zip: true
+  force_rebuild: false
+  audio_extensions:
+    - .wav
+    - .mp3
+    - .flac
+    - .ogg
+    - .m4a
+    - .aac
+    - .wma
+  metadata_match_priority:
+    - relative_path
+    - file_name
+    - base_name
+  report_top_n_unmatched_examples: 25
+  output_subdir: "00_manifest"
+
+ssl:
+  model_name: "facebook/wav2vec2-base"
+  target_sample_rate: 16000
+  output_subdir: "01_ssl_frames"
+  save_dtype: "float16"
+  overwrite: false
+  device: "auto"
+  normalize_peak: true
+  min_duration_sec: 0.05
+  save_frame_times: true
+  max_clips: null
+
+segmentation:
+  smoothing_window_frames: 7
+  distance_metric: cosine
+  boundary_zscore_threshold: 1.5
+  peak_min_distance_frames: 4
+  min_segment_duration_ms: 120
+  min_frames_per_segment: 4
+  merge_shorter_than_ms: 80
+  output_subdir: "02_segments_refined"
+
+clustering:
+  candidate_k:
+    - 32
+    - 48
+    - 64
+    - 80
+    - 96
+  num_seeds: 5
+  random_state_base: 42
+  batch_size: 2048
+  max_iter: 200
+  reassignment_ratio: 0.01
+  segment_vectors_subdir: "03_segment_vectors_refined"
+  kstudy_subdir: "04_kstudy_refined"
+
+tokens:
+  output_subdir: "05_tokens_refined"
+  overwrite: false
+  token_prefix: "u"
+  token_zero_pad: null
+  round_time_decimals: 4
+  include_manifest_metadata_in_jsonl: true
+
+dictionary:
+  output_subdir: "06_dictionary_refined"
+
+audits:
+  output_subdir: "07_audits_refined"
+  dominant_warning_threshold: 0.80
+  dominant_high_threshold: 0.90
+  min_segments_for_flag: 8
+
+visualization:
+  figures_subdir: "08_layer1_figures_refined"
+
+audit:
+  bias_flag_min_share: 0.70
+  min_unit_count_for_flagging: 10

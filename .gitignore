@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# project data and generated outputs (never published)
+data/
+output/
+temp_input_files/
+*.docx
+*.pdf
+*.zip
