@@ -137,8 +137,8 @@ def build_audio_matrix(family, variant, sequences, train_clips, all_clips, retai
             m = np.zeros((K, K), dtype=np.float32)
             for a, b in zip(toks[:-1], toks[1:]):
                 m[a, b] += 1.0
-            total = m.sum()
-            return (m / total).ravel() if total else m.ravel()
+            row_totals = m.sum(axis=1, keepdims=True)
+            return np.divide(m, row_totals, out=np.zeros_like(m), where=row_totals > 0).ravel()
         return np.vstack([vec(sequences[c]) for c in all_clips])
 
     if family == "tfidf_1to3":

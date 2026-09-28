@@ -156,7 +156,7 @@ def selective_prediction(y_true, y_pred, confidence, coverages, average="macro")
     y_true = np.asarray(y_true)
     y_pred = np.asarray(y_pred)
     confidence = np.asarray(confidence)
-    order = np.argsort(-confidence)
+    order = np.argsort(-confidence, kind="stable")
     n = len(y_true)
     rows = []
     for cov in coverages:
@@ -171,3 +171,14 @@ def selective_prediction(y_true, y_pred, confidence, coverages, average="macro")
             "n_retained": k,
         })
     return rows
+
+
+def deferred_mask(confidence, coverage=0.80):
+    """Boolean mask of the clips withheld at the given coverage, using the same
+    stable confidence ranking as selective_prediction."""
+    confidence = np.asarray(confidence)
+    n = len(confidence)
+    order = np.argsort(-confidence, kind="stable")
+    mask = np.ones(n, dtype=bool)
+    mask[order[:max(int(round(coverage * n)), 1)]] = False
+    return mask

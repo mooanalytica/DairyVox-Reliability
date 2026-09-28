@@ -26,7 +26,7 @@ each unit a within-corpus reliability tier.
 ## Layout
 
 ```
-notebooks/        pipeline notebooks, numbered in run order (00-16)
+notebooks/        pipeline notebooks, numbered in run order (00-16; 13b after 13)
   layer2_foldwise.py     fold-local vocabulary + token features
   layer3_reliability.py  calibration and selective prediction
   cnn_baseline.ipynb     log-mel CNN baseline
@@ -39,13 +39,14 @@ docker/               runtime image
 Everything runs inside the Docker image (PyTorch, torchaudio, scikit-learn):
 
 ```bash
-docker build -t cowvocal ./docker
+docker build -t cowvocal -f docker/Dockerfile .
 docker run --rm --gpus all -v "$(pwd)":/workspace -w /workspace cowvocal \
   jupyter nbconvert --to notebook --execute --inplace notebooks/00_build_manifest.ipynb
 ```
 
-Run the notebooks in order. Seeds are fixed in `configs/config.yaml` and in the
-clustering and model code, so runs are reproducible.
+Run the notebooks in order. Random seeds are fixed in the notebook and module code
+(clustering, models, CNN), and the CNN uses deterministic GPU settings, so runs are
+reproducible.
 
 ## Results and outputs
 
