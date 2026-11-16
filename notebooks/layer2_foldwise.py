@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -31,7 +30,6 @@ CONTEXT_VARIANTS = ["audio_only", "plus_structural_context", "plus_full_context"
 
 
 def load_corpus():
-    """Return per-segment embeddings and a clip-level metadata/label frame."""
     seg = np.load(ROOT / "output/03_segment_vectors_refined/segment_vectors.npz",
                   allow_pickle=True)
     seg_vectors = seg["vectors"].astype(np.float32)
@@ -63,8 +61,6 @@ def load_corpus():
 
 
 def fit_fold_vocabulary(seg_vectors, train_mask):
-    """Fit standardization, PCA, and K-means on training segments; return a
-    function that maps any segment matrix to fold-local token indices."""
     train_vectors = seg_vectors[train_mask]
     scaler = StandardScaler().fit(train_vectors)
     pca = PCA(n_components=PCA_DIM, random_state=CLUSTER_SEED).fit(scaler.transform(train_vectors))
@@ -80,7 +76,6 @@ def fit_fold_vocabulary(seg_vectors, train_mask):
 
 
 def build_token_sequences(token_ids, seg_clip, seg_index):
-    """Return {clip_id: [unit_index, ...]} ordered by segment index."""
     order = np.lexsort((seg_index, seg_clip))
     sequences: dict[str, list[int]] = {}
     for i in order:
@@ -89,8 +84,6 @@ def build_token_sequences(token_ids, seg_clip, seg_index):
 
 
 def audit_filtered_units(token_ids, seg_clip, train_clip_set, clips):
-    """Return the set of unit indices retained in the high-bias-filtered
-    vocabulary, using a context-bias audit over training clips only."""
     ctx = clips.set_index("clip_id")[BIAS_FIELDS]
     train_mask = np.array([c in train_clip_set for c in seg_clip])
     df = pd.DataFrame({"unit": token_ids[train_mask], "clip_id": seg_clip[train_mask]})
@@ -118,8 +111,6 @@ def _filtered_seq(seq, retained):
 
 
 def build_audio_matrix(family, variant, sequences, train_clips, all_clips, retained_units):
-    """Return an aligned dense audio-feature matrix for the given family and
-    vocabulary variant, ordered as all_clips. Vectorizers are fit on train_clips."""
     retained = retained_units if variant == "high_bias_filtered" else set(range(K))
 
     if family == "unigram_props":
@@ -151,8 +142,6 @@ def build_audio_matrix(family, variant, sequences, train_clips, all_clips, retai
 
 
 def build_context_matrix(variant, clips, train_clips, all_clips):
-    """Return an aligned one-hot context matrix for the given context variant,
-    or None for audio_only. Encoder is fit on train_clips."""
     if variant == "audio_only":
         return None
     cols = STRUCTURAL_CONTEXT_COLS if variant == "plus_structural_context" else FULL_CONTEXT_COLS

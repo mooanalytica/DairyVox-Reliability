@@ -81,9 +81,6 @@ audits:
   dominant_high_threshold: 0.90
   min_segments_for_flag: 8
 
-visualization:
-  figures_subdir: "08_layer1_figures_refined"
-
 audit:
   bias_flag_min_share: 0.70
   min_unit_count_for_flagging: 10
